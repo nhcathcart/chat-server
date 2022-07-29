@@ -44,7 +44,10 @@ class Server:
                 
                 if message:
                     print(f"Received message : {message}")
-                    command = message_list[0]
+                    try:
+                        command = message_list[0]
+                    except IndexError:
+                        user.send('Cannot send empty messages/commands. Try again'.encode())
                     
                     if self.connected_users[user].is_registered():
 
@@ -71,6 +74,7 @@ class Server:
                             try:
                                 if message_list[1] not in self.channels:
                                     self.channels[message_list[1]] = [self.connected_users[user].nick]
+                                    user.send(f":{self.name}: {message_list[1]} has been created.".encode())
                                     print(self.channels[message_list[1]])
                                 else:
                                     source = self.connected_users[user].nick
@@ -91,7 +95,15 @@ class Server:
                                 channel_message(channel=channel, msg=msg)
                             except IndexError:
                                 user.send("Messages to a channel must be in this format: #<channel_name> <message>".encode())
-                        
+                            except KeyError:
+                                user.send("That channel doesn't exist. Try again or create it with: JOIN #<new_channel_name>".encode())
+                        elif command == 'QUIT':
+                            user_quit(user)
+                            print(self.registered_users.keys())
+                            print(self.connected_users.keys())
+                            return
+                        else:
+                            user.send('Command not found'.encode())
                     #registration
                     elif command != 'NICK' and command != 'USER':
                         reply = 'You must register before you can use the chat'
@@ -104,20 +116,21 @@ class Server:
                                 reply = f':{self.name}: Successfully registered! Welcome to the chat {self.connected_users[user].nick}!'
                                 self.registered_users[self.connected_users[user].nick] = user
                                 user.send(reply.encode())
-                                print(reply)
+                                
                         else:
-                            user.send('That Nickname is already taken.'.encode())
+                            user.send('That Nickname is already taken. Try again.'.encode())
                     elif command == 'USER':
                         if self.connected_users[user].username == None:
-                            self.connected_users[user].username = message[4:].strip()
+                            self.connected_users[user].username = ''.join(message_list[1:])
                             if self.connected_users[user].is_registered():
                                 reply = f':{self.name}: Successfully registered! Welcome to the chat {self.connected_users[user].nick}!'
                                 self.registered_users[self.connected_users[user].nick] = user
                                 user.send(reply.encode())
-                                print(reply)
-                    else:
-                            user.send('Command not found'.encode())
+                    
                 else:
+                    user_quit(user)
+                    print(self.registered_users.keys())
+                    print(self.connected_users.keys())
                     return
 
         def broadcast(msg):
@@ -130,9 +143,21 @@ class Server:
         def channel_message(channel, msg):
             for nick in self.channels[channel]:
                 self.registered_users[nick].send(msg.encode())
-
+        def user_quit(user):
+            user.send('You have disconnected from the server.'.encode())
+            try:
+                del self.registered_users[self.connected_users[user].nick]
+            except KeyError:
+                pass
+            try:
+                del self.connected_users[user]
+            except KeyError:
+                pass
         start_listening()
         
-
-my_server = Server('test_server', 8000,'0.0.0.0')
+server_name = 'chat-server'
+port = 8000
+address = '0.0.0.0'
+my_server = Server(server_name, port, address)
+print(f"{server_name} is now running.")
 my_server.start()
