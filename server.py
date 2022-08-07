@@ -3,7 +3,7 @@ import threading
 import redis
 import bcrypt
 
-r = redis.Redis(host='localhost', port='6379', decode_responses=True)
+r = redis.Redis(host='myredis', port='6379', decode_responses=True)
 
 class User:
     def __init__(self, nick=None, password=None):
@@ -100,8 +100,6 @@ class Server:
                     
                 else:
                     user_quit(user)
-                    print(self.online_users.keys())
-                    print(self.connected_users.keys())
                     return
 
         #command functions/registered users

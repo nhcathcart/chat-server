@@ -1,3 +1,3 @@
 # Chat Server
 
-This is a basic chat server and client very loosely based on the IRC protocol. I made it to learn about socket programming. It registers users with a NICK and USER. It supports channels, private messaging, and broadcast. In the future I would like to implement some kind of data store, so that NICKs and USERs can persist in between logins.
+This is a basic chat server and client very loosely based on the IRC protocol. I made it to learn about socket programming. It registers users with a NICK(nickname) and a PASS(password). Users then can LOGIN to the server using their NICK and PASS in another session. It supports channels, private messaging, who is online, get channel members, and broadcast. It uses REDIS as a data store to persist nicknames, passwords, and channel subscribers.
