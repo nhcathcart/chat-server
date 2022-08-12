@@ -13,4 +13,4 @@ Navigate to the cloned repository and run the following commands:
 - ```docker run --name myredis --network <network_name> -p 6379:6379 -d redis```
 - ```docker run --name myserver --network <network_name> -p 8000:8000 <server_name>```
 
-You can then interact with the server with Telnet or with the client included in the repo from another terminal window.
+You can then interact with the server with Telnet or with the client included in the repo from another terminal window. Enter HELP for a command list.
